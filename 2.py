@@ -31,8 +31,7 @@ class SGD:
 
             # Choose a random sample
             iRand = randint(0, self.totalSamples - 1)
-            xSample = x[iRand]
-            ySample = y[iRand]
+            xSample, ySample = x[iRand], y[iRand]
 
             # Embed the "b" term
             xSample = np.insert(xSample, 0, 1, axis=0)
@@ -93,3 +92,11 @@ plt.xlabel("epoch")
 plt.ylabel("cost")
 plt.plot(epochs, costs)
 plt.show()
+
+
+# sx = preprocessing.MinMaxScaler()
+# sy = preprocessing.MinMaxScaler()
+# scaled_X = sx.fit_transform(trainSet.drop("Strength", axis="columns"))
+# scaled_y = sy.fit_transform(trainSet["Strength"].values.reshape(trainSet.shape[0], 1))
+# print(scaled_X)
+# exit()
