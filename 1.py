@@ -25,6 +25,9 @@ class LinearRegression:
 
         # Init Plot
         fig, ax = plt.subplots()
+        ax.set_title(f"Strength vs {self.featureName}")
+        _units = " (kg)" if self.featureName != "Age" else " (days)"
+        ax.set(xlabel=self.featureName + _units, ylabel="Strength (MPa)")
         ax.plot(x, y, "bo")
 
         for _ in range(epoch):
@@ -46,7 +49,7 @@ class LinearRegression:
         plt.plot(x, res, "ro")
         plt.show()
 
-        return w, b, costs, epochs
+        return w, b, costs
 
 
 # Read data
@@ -80,7 +83,6 @@ for (columnName, columnData) in trainSet.iteritems():
     if columnName != "Strength":
         trainSet_y = trainSet["Strength"]
         trainSet_x = columnData
-
         # Perform
         obj = LinearRegression(trainSet_x, trainSet_y, columnName)
-        w, b, costs, epochs = obj.do_BGD()
+        w, b, costs = obj.do_BGD()
