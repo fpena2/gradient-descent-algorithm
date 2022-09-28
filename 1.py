@@ -3,6 +3,11 @@ import numpy as np
 from random import randint
 from matplotlib import pyplot as plt
 from sklearn import preprocessing
+from sklearn.metrics import (
+    explained_variance_score,
+    mean_absolute_error,
+    mean_squared_error,
+)
 
 
 class LinearRegression:
@@ -12,18 +17,16 @@ class LinearRegression:
         self.featureName = featureName
         self.totalSamples = len(self.x)
 
-    def do_BGD(self, epoch=100000, learnRate=0.2):
+    def do_BGD(self, epoch, learnRate):
         # Track
         costs = {}
-
+        vars = {}
         # Initialization
         w = 0
         b = 0
-
         # Convert DataFrames into Numpy arrays
         x = self.x.to_numpy()
         y = self.y.to_numpy()
-
         # Preprocess and Scale the input and output arrays
         xScaler = preprocessing.MinMaxScaler()
         yScaler = preprocessing.MinMaxScaler()
@@ -38,7 +41,6 @@ class LinearRegression:
         ax.plot(x, y, "bo")
 
         for _ in range(epoch):
-
             # Choose a random sample
             iRand = randint(0, self.totalSamples - 1)
             xSample, ySample = x[iRand], y[iRand]
@@ -48,6 +50,9 @@ class LinearRegression:
 
             # Get cost (Mean Squared Error)
             costs[_] = np.mean(np.square(ySample - yPredicted))
+
+            # Get cost (Mean Absolute Error)
+            # costs[_] = np.mean(np.absolute(ySample - yPredicted))
 
             # Calculate the gradient (derivative)
             wGrad = -(2 / self.totalSamples) * np.sum((ySample - yPredicted) * xSample)
@@ -59,27 +64,35 @@ class LinearRegression:
 
         # Plot
         res = w * x + b
-        ax.plot(x, res, "ro")
-        # Plot
+        ax.plot(x, res, "r")
+        # Plot Config
         xCosts, yCosts = zip(*costs.items())
+        bx.set_title(f"Cost")
+        bx.set(xlabel="Epoch", ylabel="MSE")
         bx.plot(xCosts, yCosts)
+        plt.tight_layout()
+        # Print Metrics
+        print(f"MSE = {mean_squared_error(y, res)}")
+        print(f"MAE = {mean_absolute_error(y, res)}")
+        print(f"VE = {explained_variance_score(y, res)}")
         plt.show()
 
 
 # Read data
-labels = [
-    "Cement",
-    "BlastFurnaceSlag",
-    "FlyAsh",
-    "Water",
-    "Superplasticizer",
-    "CoarseAgg",
-    "FineAgg",
-    "Age",
-    "Strength",
-]
+settings = {
+    "Cement": [100000, 0.5],
+    "BlastFurnaceSlag": [100000, 0.5],
+    "FlyAsh": [100000, 0.5],
+    "Water": [100000, 0.5],
+    "Superplasticizer": [100000, 0.3],
+    "CoarseAgg": [100000, 0.3],
+    "FineAgg": [100000, 0.5],
+    "Age": [100000, 0.5],
+    "Strength": [],
+}
+
 dataFilename = "Concrete_Data.xls"
-df = pd.read_excel(dataFilename, names=labels)
+df = pd.read_excel(dataFilename, names=settings.keys())
 
 # This data set has 25 duplicates. Make unique by adding an index.
 df["index"] = range(1, len(df) + 1)
@@ -92,17 +105,6 @@ testSet = pd.concat([df, trainSet]).drop_duplicates(keep=False)
 trainSet.pop("index")
 testSet.pop("index")
 
-settings = {
-    "Cement": [100000, 0.5],
-    "BlastFurnaceSlag": [100000, 0.5],
-    "FlyAsh": [100000, 0.5],
-    "Water": [100000, 0.5],
-    "Superplasticizer": [100000, 0.3],
-    "CoarseAgg": [100000, 0.3],
-    "FineAgg": [100000, 0.5],
-    "Age": [100000, 0.5],
-    "Strength": [],
-}
 
 DONT_PROCESS = [
     "Cement",
@@ -122,4 +124,4 @@ for (columnName, columnData) in trainSet.iteritems():
         config = settings[columnName]
         # Perform
         obj = LinearRegression(trainSet_x, trainSet_y, columnName)
-        obj.do_BGD(config[0], config[1])
+        obj.do_BGD(epoch=config[0], learnRate=config[1])

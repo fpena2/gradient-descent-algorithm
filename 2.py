@@ -2,6 +2,12 @@ import pandas as pd
 import numpy as np
 from random import randint
 from matplotlib import pyplot as plt
+from sklearn import preprocessing
+from sklearn.metrics import (
+    explained_variance_score,
+    mean_absolute_error,
+    mean_squared_error,
+)
 
 
 class SGD:
@@ -11,10 +17,9 @@ class SGD:
         self.totalFeatures = len(self.x.columns)
         self.totalSamples = len(self.x)
 
-    def do_SGD(self, epoch=1000, learnRate=0.00001):
+    def do_SGD(self, epoch, learnRate):
         # Track
-        epochs = []
-        costs = []
+        costs = {}
 
         # Initialization
         b = 0
@@ -39,23 +44,27 @@ class SGD:
             # Calculate the hypothesis
             yPredicted = np.dot(w, xSample.T)
 
+            # Get cost (Mean Squared Error)
+            costs[_] = np.mean(np.square(ySample - yPredicted))
+
             # Calculate the gradient (derivative)
             wGrad = -(2 / self.totalSamples) * np.dot((ySample - yPredicted), xSample.T)
 
             # Update
             w = w - learnRate * wGrad
 
-            # Get cost (Mean Squared Error)
-            cost = np.mean(np.square(ySample - yPredicted))
+        res = []
+        x = np.insert(x, 0, 1, axis=1)
 
-            costs.append(cost)
-            epochs.append(_)
+        for row in x:
+            res.append(np.dot(w.T, row))
 
-        return w, cost, costs, epochs
-
-    def do_prediction(testSample, w):
-        pass
-        res = w[0] + w[1] + w[2] + w[3] + w[4] + w[5] + w[6] + w[7]
+        # Print Metrics
+        print(f"MSE = {mean_squared_error(y, res)}")
+        print(f"MAE = {mean_absolute_error(y, res)}")
+        print(f"VE = {explained_variance_score(y, res)}")
+        plt.plot(costs.keys(), costs.values())
+        plt.show()
 
 
 # Read data
@@ -84,19 +93,10 @@ testSet = pd.concat([df, trainSet]).drop_duplicates(keep=False)
 trainSet.pop("index")
 testSet.pop("index")
 
-w, cost, costs, epochs = SGD(trainSet).do_SGD()
+# Scale data in-place
+df = trainSet
+scaler = preprocessing.MinMaxScaler()
+df[df.columns] = scaler.fit_transform(df[df.columns])
 
-
-# Display info
-plt.xlabel("epoch")
-plt.ylabel("cost")
-plt.plot(epochs, costs)
-plt.show()
-
-
-# sx = preprocessing.MinMaxScaler()
-# sy = preprocessing.MinMaxScaler()
-# scaled_X = sx.fit_transform(trainSet.drop("Strength", axis="columns"))
-# scaled_y = sy.fit_transform(trainSet["Strength"].values.reshape(trainSet.shape[0], 1))
-# print(scaled_X)
-# exit()
+a = SGD(df)
+a.do_SGD(10000, 0.5)
