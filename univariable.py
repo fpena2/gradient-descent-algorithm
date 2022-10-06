@@ -9,20 +9,20 @@ from sklearn.metrics import (
     r2_score,
 )
 
-PROCESSING_TYPE = "SCALED"
-# PROCESSING_TYPE = "NORMAL"
+# PROCESSING_TYPE = "SCALED"
+PROCESSING_TYPE = "NORMAL"
 ALGO = "MSE"
 # ALGO = "MAE"
 
 DONT_PROCESS = [
-    "Cement",
-    "BlastFurnaceSlag",
-    "FlyAsh",
-    "Water",
-    "Superplasticizer",
+    # "Cement",
+    # "BlastFurnaceSlag",
+    # "FlyAsh",
+    # "Water",
+    # "Superplasticizer",
     # "CoarseAgg",
     # "FineAgg",
-    "Age",
+    # "Age",
 ]
 # ========================
 #
@@ -40,8 +40,8 @@ settings = {
         "Strength": [],
     },
     "NORMAL_MSE": {
-        "Cement": [500000, 0.005],
-        "BlastFurnaceSlag": [500000, 0.006],
+        "Cement": [100000, 0.001],
+        "BlastFurnaceSlag": [500000, 0.001],
         "FlyAsh": [500000, 0.05],
         "Water": [500000, 0.005],
         "Superplasticizer": [500000, 0.005],
@@ -51,25 +51,25 @@ settings = {
         "Strength": [],
     },
     "SCALED_MSE": {
-        "Cement": [100000, 0.05],
-        "BlastFurnaceSlag": [100000, 0.05],
-        "FlyAsh": [100000, 0.05],
-        "Water": [100000, 0.05],
-        "Superplasticizer": [100000, 0.05],
-        "CoarseAgg": [100000, 0.1],
-        "FineAgg": [100000, 0.1],
-        "Age": [100000, 0.05],
+        "Cement": [100000, 0.5],
+        "BlastFurnaceSlag": [100000, 0.5],
+        "FlyAsh": [100000, 0.5],
+        "Water": [100000, 0.5],
+        "Superplasticizer": [100000, 0.5],
+        "CoarseAgg": [100000, 0.5],
+        "FineAgg": [100000, 0.5],
+        "Age": [100000, 0.5],
         "Strength": [],
     },
     "SCALED_MAE": {
-        "Cement": [100000, 0.05],
-        "BlastFurnaceSlag": [100000, 0.05],
-        "FlyAsh": [100000, 0.05],
-        "Water": [100000, 0.05],
-        "Superplasticizer": [100000, 0.05],
-        "CoarseAgg": [100000, 0.05],
-        "FineAgg": [100000, 0.05],
-        "Age": [100000, 0.05],
+        "Cement": [100000, 0.5],
+        "BlastFurnaceSlag": [100000, 0.5],
+        "FlyAsh": [100000, 0.5],
+        "Water": [100000, 0.5],
+        "Superplasticizer": [100000, 0.5],
+        "CoarseAgg": [100000, 0.5],
+        "FineAgg": [100000, 0.5],
+        "Age": [100000, 0.5],
         "Strength": [],
     },
 }
@@ -102,6 +102,7 @@ def main():
     # Loop over each column
     for (columnName, columnData) in trainSet.iteritems():
         if columnName not in ["Strength"] + DONT_PROCESS:
+            print(columnName)
             trainSet_y = trainSet["Strength"]
             trainSet_x = columnData
             config = settings[f"{PROCESSING_TYPE}_{ALGO}"][columnName]
@@ -132,8 +133,6 @@ class LinearRegression:
         self.algo = algo
         self.MSE_cost = {}  # Tracking variable
 
-        print(self.featureName)
-
         # Calls
         self.w, self.b = self.do_BGD(epochs, learnRate)
         self.saveCostPlot()
@@ -152,6 +151,10 @@ class LinearRegression:
 
             # Get cost (Mean Squared Error)
             self.MSE_cost[_] = mean_squared_error(ySample, yPredicted)
+
+            # Exit condition
+            if self.MSE_cost[_] < 1e-12:
+                break
 
             if self.algo == "MSE":
                 # Calculate the gradient (MSE)
