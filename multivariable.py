@@ -13,10 +13,10 @@ from sklearn.metrics import (
 np.set_printoptions(linewidth=150)
 
 # Globals
-PROCESSING_TYPE = "SCALED"
-# PROCESSING_TYPE = "NORMAL"
-ALGO = "MSE"
-# ALGO = "MAE"
+# PROCESSING_TYPE = "SCALED"
+PROCESSING_TYPE = "NORMAL"
+# ALGO = "MSE"
+ALGO = "MAE"
 
 settings = {
     "SCALED_MSE": [80000, 0.1],
@@ -93,7 +93,7 @@ class SGD:
         MSE_cost = {}
 
         # Initialization. The "b" term is embedded into this array
-        w = np.zeros(shape=(self.totalFeatures + 1)) + 0.1
+        w = np.zeros(shape=(self.totalFeatures + 1))
 
         #  Start
         for _ in range(epochs):
@@ -150,7 +150,7 @@ class SGD:
         x, y = x.to_numpy(), y.to_numpy()
         _x = np.insert(x, 0, 1, axis=1)
         res = np.sum(self.w * _x, axis=1)
-        print(self.w)
+        # print(self.w)
         print(f"{explained_variance_score(y, res)}")
 
 

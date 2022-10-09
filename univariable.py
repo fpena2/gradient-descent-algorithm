@@ -24,9 +24,7 @@ DONT_PROCESS = [
     # "FineAgg",
     # "Age",
 ]
-# ========================
-#
-# ========================
+
 settings = {
     "NORMAL_MAE": {
         "Cement": [100000, 0.005],
@@ -73,9 +71,6 @@ settings = {
         "Strength": [],
     },
 }
-# ========================
-#
-# ========================
 
 
 def main():
@@ -184,10 +179,7 @@ class LinearRegression:
     def predict(self, x_test, y_test):
         x_test, y_test = x_test.to_numpy(), y_test.to_numpy()
         res = self.w * x_test + self.b
-        # print(y_test)
-        # print(res)
         print(f"\t EV, {explained_variance_score(list(y_test), list(res))}")
-        # print(f"R2 = {r2_score(y_test, res)}")
 
     """
     Uses the training data to produce charts 
