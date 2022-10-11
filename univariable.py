@@ -6,11 +6,10 @@ from sklearn import preprocessing
 from sklearn.metrics import (
     explained_variance_score,
     mean_squared_error,
-    r2_score,
 )
 
-# PROCESSING_TYPE = "SCALED"
-PROCESSING_TYPE = "NORMAL"
+PROCESSING_TYPE = "SCALED"
+# PROCESSING_TYPE = "NORMAL"
 ALGO = "MSE"
 # ALGO = "MAE"
 
@@ -26,17 +25,6 @@ DONT_PROCESS = [
 ]
 
 settings = {
-    "NORMAL_MAE": {
-        "Cement": [100000, 0.005],
-        "BlastFurnaceSlag": [100000, 0.0000039],
-        "FlyAsh": [500000, 0.5],
-        "Water": [100000, 0.000029],
-        "Superplasticizer": [100000, 2.5],
-        "CoarseAgg": [100000, 0.00005],
-        "FineAgg": [300000, 0.000009],
-        "Age": [500000, 0.5],
-        "Strength": [],
-    },
     "NORMAL_MSE": {
         "Cement": [100000, 0.001],
         "BlastFurnaceSlag": [500000, 0.001],
@@ -46,6 +34,17 @@ settings = {
         "CoarseAgg": [500000, 0.00005],
         "FineAgg": [500000, 0.0005],
         "Age": [500000, 0.0005],
+        "Strength": [],
+    },
+    "NORMAL_MAE": {
+        "Cement": [100000, 0.005],
+        "BlastFurnaceSlag": [100000, 0.0000039],
+        "FlyAsh": [500000, 0.5],
+        "Water": [100000, 0.000029],
+        "Superplasticizer": [100000, 2.5],
+        "CoarseAgg": [100000, 0.00005],
+        "FineAgg": [300000, 0.000009],
+        "Age": [500000, 0.5],
         "Strength": [],
     },
     "SCALED_MSE": {
@@ -110,12 +109,12 @@ def main():
                 epochs=config[0],
                 learnRate=config[1],
             )
-            obj.predict(trainSet_x, trainSet_y)
+            obj.predict(trainSet_x, trainSet_y, "Train")
 
             # Predict test data
             testSet_x = testSet[columnName]
             testSet_y = testSet["Strength"]
-            obj.predict(testSet_x, testSet_y)
+            obj.predict(testSet_x, testSet_y, "Test")
 
 
 class LinearRegression:
@@ -176,10 +175,12 @@ class LinearRegression:
         y: Pandas DataFrame with a single column (response)
     """
 
-    def predict(self, x_test, y_test):
+    def predict(self, x_test, y_test, info):
         x_test, y_test = x_test.to_numpy(), y_test.to_numpy()
         res = self.w * x_test + self.b
-        print(f"\t EV, {explained_variance_score(list(y_test), list(res))}")
+        print(
+            f"\t{info} Variance Explained= {explained_variance_score(list(y_test), list(res))}"
+        )
 
     """
     Uses the training data to produce charts 
@@ -204,7 +205,7 @@ class LinearRegression:
         bx.set(xlabel="Epoch", ylabel="MSE")
         bx.plot(xCosts, yCosts)
         plt.tight_layout()
-        plt.savefig(f"./img_output/{self.featureName}")
+        plt.savefig(f"./imgs/{self.featureName}")
 
 
 if __name__ == "__main__":

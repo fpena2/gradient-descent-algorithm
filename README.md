@@ -1,55 +1,92 @@
 # gradient-descent-algorithm
 
-Implementation of a Gradient Descent based Linear Regression Algorithm.
+Implementation of Linear Regression Models based on the Gradient Descent Algorithm.
 
-## Non Processed Data Learning Rates (MAE)
+## Requirements
+
+-   Python 3.10+
+-   Python Libraries
+    -   pandas
+    -   numpy
+    -   matplotlib
+    -   sklearn
+
+Use the following command to automatically install all dependencies:
+'''
+pip install requirements.txt
+'''
+
+# How to run
+
+Simply clone this repository and run the following commands:
+
+-   For the uni-variable implementation:
+    ```
+    python univariable.py
+    ```
+-   For the multi-variable implementation:
+    ```
+    python multivariable.py
+    ```
+
+# Expected Input
+
+There are two variables that are used to control the scripts: `PROCESSING_TYPE` and `ALGO`
+
+-   `PROCESSING_TYPE` can be either `"SCALED"` or `"NORMAL"`.
+
+-   `ALGO` can be either `"MSE"` or `"MAE"`.
+
+### Example
+
+If you want to use the objective function of Mean Squared Error (MSE) and pre-process the training data, then set:
 
 ```
-    "NORMAL": {
-        "Cement": [100000, 0.005],
-        "BlastFurnaceSlag": [100000, 0.0000039],
-        "FlyAsh": [500000, 0.5],
-        "Water": [100000, 0.000029],
-        "Superplasticizer": [100000, 2.5],
-        "CoarseAgg": [100000, 0.00005],
-        "FineAgg": [300000, 0.000009],
-        "Age": [500000, 0.5],
-        "Strength": [],
-    },
+ALGO = "MSE"
+PROCESSING_TYPE = "SCALED"
 ```
 
-## Non Processed Data Learning Rates (MSE)
+# Expected Output
+
+Running each script will generate image output in the `./imgs/` directory.
+
+For the uni-variable script the images will contain two graphs: Linear fit and plot of the cost function. The multi-variable script will only include a graph of the cost function. In addition, both scripts will print to the terminal the Variance Explained for each feature for both training and testing scenarios.
+
+## Sample Terminal Output (Uni-variable):
 
 ```
-    "NORMAL": {
-        "Cement": [500000, 0.005],
-        "BlastFurnaceSlag": [500000, 0.006],
-        "FlyAsh": [500000, 0.05],
-        "Water": [500000, 0.005],
-        "Superplasticizer": [500000, 0.005],
-        "CoarseAgg": [500000, 0.00005],
-        "FineAgg": [500000, 0.0005],
-        "Age": [500000, 0.0005],
-        "Strength": [],
-    },
+Cement
+        Train Variance Explained= 0.2474520281413406
+        Test Variance Explained= -6.426991743646967
+
+BlastFurnaceSlag
+        Train Variance Explained= 0.022963335238228688
+        Test Variance Explained= -0.5452863072316203
+
+FlyAsh
+        Train Variance Explained= 0.01629579685651139
+        Test Variance Explained= -0.16739304241051323
+
+Water
+        Train Variance Explained= 0.09252248481706282
+        Test Variance Explained= -0.06411742955040522
+
+Superplasticizer
+        Train Variance Explained= 0.1421888737897652
+        Test Variance Explained= 0.06751196830222583
 ```
 
-<!--
-sx = preprocessing.MinMaxScaler()
-sy = preprocessing.MinMaxScaler()
-scaled_X = sx.fit_transform(trainSet.drop("Strength", axis="columns"))
-scaled_y = sy.fit_transform(trainSet["Strength"].values.reshape(trainSet.shape[0], 1))
-labels = [
-    "Cement",
-    "BlastFurnaceSlag",
-    "FlyAsh",
-    "Water",
-    "Superplasticizer",
-    "CoarseAgg",
-    "FineAgg",
-    "Age",
-]
-df = pd.DataFrame(scaled_X, columns=labels)
-df.hist()
-plt.show()
--->
+## Sample Image Output (Uni-variable):
+
+![Screenshot](./imgs/Cement.png)
+
+## Sample Terminal Output (Multi-variable):
+
+```
+Train Variance Explained= 0.5404750110506564
+Test Variance Explained= -4.65288710074262
+```
+
+## Sample Image Output (Multi-variable):
+
+![Screenshot](./imgs/SCALED_MSE_multi.png)

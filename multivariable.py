@@ -6,15 +6,14 @@ from sklearn import preprocessing
 from sklearn.metrics import (
     explained_variance_score,
     mean_squared_error,
-    r2_score,
 )
 
 # Numpy printing config
 np.set_printoptions(linewidth=150)
 
 # Globals
-# PROCESSING_TYPE = "SCALED"
-PROCESSING_TYPE = "NORMAL"
+PROCESSING_TYPE = "SCALED"
+# PROCESSING_TYPE = "NORMAL"
 # ALGO = "MSE"
 ALGO = "MAE"
 
@@ -66,12 +65,12 @@ def main():
     # Call
     config = settings[f"{PROCESSING_TYPE}_{ALGO}"]
     obj = SGD(trainSet_x, trainSet_y, ALGO, config[0], config[1])
-    obj.predict(trainSet_x, trainSet_y)
+    obj.predict(trainSet_x, trainSet_y, "Train")
 
     # Calculate with Test Data
     testSet_y = testSet["Strength"]
     testSet_x = testSet.loc[:, testSet.columns != "Strength"]
-    obj.predict(testSet_x, testSet_y)
+    obj.predict(testSet_x, testSet_y, "Test")
 
 
 class SGD:
@@ -137,8 +136,10 @@ class SGD:
 
     def saveCostPlot(self, valuesMap):
         xCosts, yCosts = zip(*valuesMap.items())
+        plt.xlabel("Epoch")
+        plt.ylabel("MSE")
         plt.plot(xCosts, yCosts)
-        plt.savefig(f"./{PROCESSING_TYPE}_{ALGO}_multi")
+        plt.savefig(f"./imgs/{PROCESSING_TYPE}_{ALGO}_multi")
 
     """
     Inputs:
@@ -146,12 +147,12 @@ class SGD:
         y: Pandas DataFrame with a single column (response)
     """
 
-    def predict(self, x, y):
+    def predict(self, x, y, info):
         x, y = x.to_numpy(), y.to_numpy()
         _x = np.insert(x, 0, 1, axis=1)
         res = np.sum(self.w * _x, axis=1)
         # print(self.w)
-        print(f"{explained_variance_score(y, res)}")
+        print(f"{info} Variance Explained= {explained_variance_score(y, res)}")
 
 
 if __name__ == "__main__":
