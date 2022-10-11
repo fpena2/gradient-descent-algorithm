@@ -74,6 +74,18 @@ Water
 Superplasticizer
         Train Variance Explained= 0.1421888737897652
         Test Variance Explained= 0.06751196830222583
+
+CoarseAgg
+        Train Variance Explained= -0.008409395209443726
+        Test Variance Explained= -0.05332247068357021
+
+FineAgg
+        Train Variance Explained= 0.024493920177585227
+        Test Variance Explained= -0.23268549504955405
+
+Age
+        Train Variance Explained= 0.10184245921632529
+        Test Variance Explained= -1.079601429242926
 ```
 
 ## Sample Image Output (Uni-variable):
