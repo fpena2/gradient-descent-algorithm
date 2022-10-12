@@ -10,8 +10,8 @@ from sklearn.metrics import (
 
 PROCESSING_TYPE = "SCALED"
 # PROCESSING_TYPE = "NORMAL"
-ALGO = "MSE"
-# ALGO = "MAE"
+# ALGO = "MSE"
+ALGO = "MAE"
 
 DONT_PROCESS = [
     # "Cement",
@@ -88,7 +88,7 @@ def main():
     trainSet.pop("index")
     testSet.pop("index")
 
-    # Scale data in-place
+    # Scale training data in-place
     if PROCESSING_TYPE == "SCALED":
         scaler = preprocessing.MinMaxScaler()
         trainSet[trainSet.columns] = scaler.fit_transform(trainSet[trainSet.columns])
@@ -111,6 +111,10 @@ def main():
             )
             obj.predict(trainSet_x, trainSet_y, "Train")
 
+            # Blindly apply same transform to testing data
+            if PROCESSING_TYPE == "SCALED":
+                testSet[testSet.columns] = scaler.transform(testSet[testSet.columns])
+
             # Predict test data
             testSet_x = testSet[columnName]
             testSet_y = testSet["Strength"]
@@ -125,13 +129,13 @@ class LinearRegression:
         self.featureName = featureName
         self.totalSamples = len(x)
         self.algo = algo
-        self.MSE_cost = {}  # Tracking variable
+        self.loss = {}  # Tracking variable
 
         # Calls
-        self.w, self.b = self.do_BGD(epochs, learnRate)
+        self.w, self.b = self.train_SGD_model(epochs, learnRate)
         self.saveCostPlot()
 
-    def do_BGD(self, epochs, learnRate):
+    def train_SGD_model(self, epochs, learnRate):
         # Initialization
         w = 0
         b = 0
@@ -143,11 +147,11 @@ class LinearRegression:
             # Calculate the hypothesis
             yPredicted = w * xSample + b
 
-            # Get cost (Mean Squared Error)
-            self.MSE_cost[_] = mean_squared_error(ySample, yPredicted)
+            # Get Loss (Mean Squared Error)
+            self.loss[_] = mean_squared_error(ySample, yPredicted)
 
             # Exit condition
-            if self.MSE_cost[_] < 1e-12:
+            if self.loss[_] < 1e-12:
                 break
 
             if self.algo == "MSE":
@@ -200,9 +204,9 @@ class LinearRegression:
         res = self.w * self.x + self.b
         ax.plot(self.x, res, "r")
         # Plot MSE
-        xCosts, yCosts = zip(*self.MSE_cost.items())
-        bx.set_title(f"Cost")
-        bx.set(xlabel="Epoch", ylabel="MSE")
+        xCosts, yCosts = zip(*self.loss.items())
+        bx.set_title(f"Loss Function")
+        bx.set(xlabel="Epoch", ylabel="Error")
         bx.plot(xCosts, yCosts)
         plt.tight_layout()
         plt.savefig(f"./imgs/{self.featureName}")

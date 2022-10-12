@@ -18,10 +18,10 @@ PROCESSING_TYPE = "SCALED"
 ALGO = "MAE"
 
 settings = {
-    "SCALED_MSE": [80000, 0.1],
-    "SCALED_MAE": [8000, 0.7],
+    "SCALED_MSE": [8000, 0.1],
+    "SCALED_MAE": [8000, 0.1],
     "NORMAL_MSE": [50000, 0.0001],
-    "NORMAL_MAE": [50000, 0.0009],
+    "NORMAL_MAE": [50000, 0.0001],
 }
 
 labels = [
@@ -53,7 +53,7 @@ def main():
     trainSet.pop("index")
     testSet.pop("index")
 
-    # Scale data in-place
+    # Scale the training data in-place
     if PROCESSING_TYPE == "SCALED":
         scaler = preprocessing.MinMaxScaler()
         trainSet[trainSet.columns] = scaler.fit_transform(trainSet[trainSet.columns])
@@ -66,6 +66,10 @@ def main():
     config = settings[f"{PROCESSING_TYPE}_{ALGO}"]
     obj = SGD(trainSet_x, trainSet_y, ALGO, config[0], config[1])
     obj.predict(trainSet_x, trainSet_y, "Train")
+
+    # Blindly apply the training "transform" to testing data
+    if PROCESSING_TYPE == "SCALED":
+        testSet[testSet.columns] = scaler.transform(testSet[testSet.columns])
 
     # Calculate with Test Data
     testSet_y = testSet["Strength"]
@@ -89,7 +93,7 @@ class SGD:
 
     def train_SGD_model(self, epochs, learnRate):
         # Track
-        MSE_cost = {}
+        loss = {}
 
         # Initialization. The "b" term is embedded into this array
         w = np.zeros(shape=(self.totalFeatures + 1))
@@ -107,10 +111,10 @@ class SGD:
             yPredicted = np.dot(w, xSample.T)
 
             # Calculate the Loss (Mean Squared Error)
-            MSE_cost[_] = mean_squared_error([ySample], [yPredicted])
+            loss[_] = mean_squared_error([ySample], [yPredicted])
 
             # Exit condition
-            if MSE_cost[_] < 1e-12:
+            if loss[_] < 1e-12:
                 break
 
             if self.algo == "MSE":
@@ -126,7 +130,7 @@ class SGD:
             # Update
             w = w - learnRate * wGrad
 
-        self.saveCostPlot(MSE_cost)
+        self.saveCostPlot(loss)
         return w
 
     """
@@ -137,7 +141,8 @@ class SGD:
     def saveCostPlot(self, valuesMap):
         xCosts, yCosts = zip(*valuesMap.items())
         plt.xlabel("Epoch")
-        plt.ylabel("MSE")
+        plt.ylabel("Error")
+        plt.title("Loss Function")
         plt.plot(xCosts, yCosts)
         plt.savefig(f"./imgs/{PROCESSING_TYPE}_{ALGO}_multi")
 
