@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import numpy as np
 from random import randint
@@ -14,14 +15,14 @@ np.set_printoptions(linewidth=150)
 # Globals
 PROCESSING_TYPE = "SCALED"
 # PROCESSING_TYPE = "NORMAL"
-# ALGO = "MSE"
-ALGO = "MAE"
+ALGO = "MSE"
+# ALGO = "MAE"
 
 settings = {
-    "SCALED_MSE": [8000, 0.1],
-    "SCALED_MAE": [8000, 0.1],
-    "NORMAL_MSE": [50000, 0.0001],
-    "NORMAL_MAE": [50000, 0.0001],
+    "SCALED_MSE": [100000, 0.1],
+    "SCALED_MAE": [100000, 0.1],
+    "NORMAL_MSE": [100000, 0.0001],
+    "NORMAL_MAE": [100000, 0.0001],
 }
 
 labels = [
@@ -85,7 +86,10 @@ class SGD:
         self.algo = algo
 
         # Train the model
+        start = time.time()
         self.w = self.train_SGD_model(epochs, learnRate)
+        end = time.time()
+        print(f"Training Time = {end - start}")
 
     """
     Stochastic Gradient Descent Algorithm 
@@ -144,7 +148,7 @@ class SGD:
         plt.ylabel("Error")
         plt.title("Loss Function")
         plt.plot(xCosts, yCosts)
-        plt.savefig(f"./imgs/{PROCESSING_TYPE}_{ALGO}_multi")
+        plt.savefig(f"./imgs/M_{ALGO}_{PROCESSING_TYPE}")
 
     """
     Inputs:
