@@ -101,4 +101,4 @@ Test Variance Explained= -4.65288710074262
 
 ## Sample Image Output (Multi-variable):
 
-![Screenshot](./imgs/SCALED_MSE_multi.png)
+![Screenshot](./imgs/M_MSE_SCALED.png)
