@@ -11,8 +11,8 @@ from sklearn.metrics import (
 
 # PROCESSING_TYPE = "SCALED"
 PROCESSING_TYPE = "NORMAL"
-# ALGO = "MSE"
-ALGO = "MAE"
+ALGO = "MSE"
+# ALGO = "MAE"
 
 DONT_PROCESS = [
     # "Cement",
@@ -95,6 +95,7 @@ def main():
         trainSet[trainSet.columns] = scaler.fit_transform(trainSet[trainSet.columns])
 
     # Loop over each column
+    trainTime = 0
     for (columnName, columnData) in trainSet.iteritems():
         if columnName not in ["Strength"] + DONT_PROCESS:
             print(columnName)
@@ -102,6 +103,7 @@ def main():
             trainSet_x = columnData
             config = settings[f"{PROCESSING_TYPE}_{ALGO}"][columnName]
             # Train
+            start = time.time()
             obj = LinearRegression(
                 trainSet_x,
                 trainSet_y,
@@ -110,6 +112,8 @@ def main():
                 epochs=config[0],
                 learnRate=config[1],
             )
+            end = time.time()
+            trainTime += end - start
             obj.predict(trainSet_x, trainSet_y, "Train")
 
             # Blindly apply same transform to testing data
@@ -120,6 +124,8 @@ def main():
             testSet_x = testSet[columnName]
             testSet_y = testSet["Strength"]
             obj.predict(testSet_x, testSet_y, "Test")
+
+    print(f"Total Training time = {trainTime}")
 
 
 class LinearRegression:
